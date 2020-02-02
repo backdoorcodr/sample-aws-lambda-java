@@ -1,0 +1,50 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+group = 'com.java'
+version = '0.0.1'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile 'com.amazonaws:aws-lambda-java-core:1.2.0'
+    compile 'com.amazonaws:aws-lambda-java-events:2.2.5'
+    compile 'com.amazonaws:aws-lambda-java-log4j:1.0.0'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.9.4'
+    compile 'org.projectlombok:lombok:1.16.20'
+    compile 'org.slf4j:slf4j-log4j12:1.7.19'
+    
+    testCompile 'junit:junit:4.12'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.1'
+}
+
+    task buildLambdaPackageZip (type: Zip) {
+        from compileJava
+        from processResources
+        into('lib') {
+            from configurations.runtime
+        }
+        destinationDir = file(rootProject.projectDir.getAbsolutePath() + "/build/serverless/")
+        archiveName(baseName + "." + extension)
+
+    }
+    build.dependsOn buildLambdaPackageZip
+
